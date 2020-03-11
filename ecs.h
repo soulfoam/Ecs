@@ -182,7 +182,7 @@ ecs_stack_peek(EcsStack *s)
 {
     if (s->empty)
     {
-        ecs_warn("Failed to peek, stack is full");
+        ecs_warn("Failed to peek, stack is full %c", 32);	// print a space (we can't have no VARGS aparently...)
         return 0;
     }
     return s->data[s->top-1];
@@ -206,7 +206,7 @@ ecs_stack_pop(EcsStack *s)
 {
     if (s->empty)
     {
-        ecs_warn("Failed to pop, stack is empty");
+        ecs_warn("Failed to pop, stack is empty %c", 32);
         return 0;
     }
 
@@ -242,7 +242,8 @@ ecs_component_pool_destroy(EcsComponentPool *pool)
 ECSDEF void
 ecs_component_pool_push(EcsComponentPool *pool, uint32_t index)
 {
-    uint8_t *ptr = (uint8_t*)(pool->data + (index * pool->size));
+//    uint8_t *ptr = (uint8_t*)(pool->data + (index * pool->size));
+    uint8_t *ptr = (uint8_t*)((uint8_t*)pool->data + (index * pool->size));
     if (pool->destroy_func) pool->destroy_func(ptr);
     ecs_stack_push(pool->indexes, index);
 }
@@ -251,7 +252,8 @@ ECSDEF uint32_t
 ecs_component_pool_pop(EcsComponentPool *pool, void *data)
 {
     uint32_t index = ecs_stack_pop(pool->indexes);
-    uint8_t *ptr   = (uint8_t*)(pool->data + (index * pool->size));
+//    uint8_t *ptr   = (uint8_t*)(pool->data + (index * pool->size));
+    uint8_t *ptr   = (uint8_t*)((uint8_t*)pool->data + (index * pool->size));
     memcpy(ptr, data, pool->size);
     return index;
 }
@@ -438,7 +440,7 @@ ecs_ent_get_component(Ecs *ecs, EcsEnt e, EcsComponentType type)
 	}
 
     uint32_t c_index = ecs->components[index * ecs->component_count + type];
-    uint8_t *ptr = (uint8_t*)(ecs->pool[type].data + (c_index * ecs->pool[type].size));
+    uint8_t *ptr = (uint8_t*)((uint8_t*)ecs->pool[type].data + (c_index * ecs->pool[type].size));
 	return ptr;
 }
 
